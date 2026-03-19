@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title>Mine Oppgaver</title>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Hjem</a>
+        <a href="tema.html">Oppgaver</a>
+        <a href="Redigere-profil.html">Profil</a>
+        <button onclick="logout()">Logg ut</button>
+    </nav>
+    <div class="container">
+        <h2>Mine Oppgaver</h2>
+        <input type="text" id="taskInput" placeholder="Ny oppgave...">
+        <button onclick="addTask()">Legg til</button>
+        <ul id="taskList"></ul>
+    </div>
+    <script src="script.js"></script>
+    <script>window.onload = loadTasks;</script>
+</body>
+</html>
