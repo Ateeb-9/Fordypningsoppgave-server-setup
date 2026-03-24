@@ -6,21 +6,25 @@
     <title>Logg inn</title>
 </head>
 <body>
-    <div class="container">
+    <div class="card">
         <div id="loginForm">
-            <h2>Logg inn</h2>
-            <input type="email" id="loginEmail" placeholder="E-post">
-            <input type="password" id="loginPass" placeholder="Passord">
-            <button onclick="handleLogin()">Logg inn</button>
-            <p onclick="toggleForm()">Ingen bruker? Registrer deg her</p>
+            <div class="header mint">Innlogging</div>
+            <div class="content">
+                <input type="email" id="email" placeholder="E-post">
+                <input type="password" id="pass" placeholder="Passord">
+                <button class="btn-mint" onclick="handleLogin()">Logg inn</button>
+                <p onclick="toggleForm()">Ingen bruker? Registrer deg her</p>
+            </div>
         </div>
         <div id="regForm" style="display:none;">
-            <h2>Registrer deg</h2>
-            <input type="text" id="regUser" placeholder="Brukernavn">
-            <input type="email" id="regEmail" placeholder="E-post">
-            <input type="password" id="regPass" placeholder="Passord">
-            <button onclick="handleRegister()">Opprett konto</button>
-            <p onclick="toggleForm()">Har du bruker? Logg inn</p>
+            <div class="header mint">Registrering</div>
+            <div class="content">
+                <input type="text" id="regUser" placeholder="Brukernavn">
+                <input type="email" id="regEmail" placeholder="E-post">
+                <input type="password" id="regPass" placeholder="Passord">
+                <button class="btn-mint" onclick="handleRegister()">Opprett konto</button>
+                <p onclick="toggleForm()">Har du bruker? Logg inn her</p>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title>Rediger Profil</title>
+</head>
+<body>
+    <div class="card">
+        <div class="header yellow">Redigere Profil</div>
+        <div class="content">
+            <input type="text" id="newName" placeholder="Nytt Navn">
+            <input type="email" id="newEmail" placeholder="Ny E-post">
+            <input type="password" id="newPass" placeholder="Nytt Passord">
+            <button class="btn-mint" onclick="updateProfile()">Lagre endringer</button>
+            <button class="btn-red" onclick="window.location.href='slette-profil.html'">Slett min profil</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

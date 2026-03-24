@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title>Spill</title>
+</head>
+<body>
+    <nav><a href="index.html">Tilbake til Hjem</a></nav>
+    <div class="card">
+        <div class="header yellow">Click Challenge</div>
+        <div class="content">
+            <h2 id="timer">Tid: 10s</h2>
+            <h1 id="scoreCounter">0</h1>
+            <button id="clickBtn" class="btn-mint" onclick="countClick()" disabled>Start Spill</button>
+            <button class="btn-yellow" onclick="startGame()">KLAR? START!</button>
+        </div>
+    </div>
+    <div class="card">
+        <div class="header purple">Leaderboard</div>
+        <div class="content">
+            <table id="leaderboard"></table>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>window.onload = loadLeaderboard;</script>
+</body>
+</html>

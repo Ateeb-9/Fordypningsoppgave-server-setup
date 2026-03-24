@@ -10,63 +10,81 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static(__dirname));
 
-// Lag tabeller
+// Opprett tabell med high_score
 db.prepare(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        email TEXT,
-        password TEXT
+        username TEXT,
+        email TEXT UNIQUE,
+        password TEXT,
+        high_score INTEGER DEFAULT 0
     )
 `).run();
 
-db.prepare(`
-    CREATE TABLE IF NOT EXISTS tasks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        userId INTEGER,
-        title TEXT,
-        FOREIGN KEY(userId) REFERENCES users(id)
-    )
-`).run();
+// --- API RUTER ---
 
-// --- RUTER ---
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+// Hent alle brukere (Admin funksjon)
+app.get('/api/users', (req, res) => {
+    res.json(db.prepare('SELECT id, username, email, high_score FROM users').all());
+});
 
+// Registrering
 app.post('/api/register', (req, res) => {
     const { username, email, password } = req.body;
     try {
-        const info = db.prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)').run(username, email, password);
-        res.json({ success: true, userId: info.lastInsertRowid });
-    } catch (err) { res.status(400).json({ error: "Brukernavn opptatt" }); }
+        db.prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)').run(username, email, password);
+        res.json({ success: true });
+    } catch (e) { res.status(400).json({ error: "E-posten er opptatt!" }); }
 });
 
+// Innlogging med Admin-sjekk
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
     const user = db.prepare('SELECT * FROM users WHERE email = ? AND password = ?').get(email, password);
-    if (user) res.json({ success: true, user });
-    else res.status(401).json({ error: "Feil e-post eller passord" });
+    
+    if (user) {
+        // Tvinger isAdmin til true hvis e-posten er admin@gmail.com
+        const isAdmin = (user.email === 'admin@gmail.com');
+        res.json({ 
+            success: true, 
+            user: { 
+                id: user.id, 
+                username: user.username, 
+                email: user.email, 
+                isAdmin: isAdmin 
+            } 
+        });
+    } else {
+        res.status(401).json({ error: "Feil e-post eller passord!" });
+    }
 });
 
+// Oppdater profil
 app.put('/api/user/:id', (req, res) => {
     const { username, email, password } = req.body;
     db.prepare('UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?').run(username, email, password, req.params.id);
     res.json({ success: true });
 });
 
+// Slett profil
 app.delete('/api/user/:id', (req, res) => {
     db.prepare('DELETE FROM users WHERE id = ?').run(req.params.id);
     res.json({ success: true });
 });
 
-// Tema-ruter (Oppgaver)
-app.get('/api/tasks/:userId', (req, res) => {
-    const tasks = db.prepare('SELECT * FROM tasks WHERE userId = ?').all(req.params.userId);
-    res.json(tasks);
+// Lagre spill-score
+app.post('/api/save-score', (req, res) => {
+    const { userId, score } = req.body;
+    const user = db.prepare('SELECT high_score FROM users WHERE id = ?').get(userId);
+    if (score > user.high_score) {
+        db.prepare('UPDATE users SET high_score = ? WHERE id = ?').run(score, userId);
+        res.json({ success: true, newRecord: true });
+    } else res.json({ success: true, newRecord: false });
 });
 
-app.post('/api/tasks', (req, res) => {
-    db.prepare('INSERT INTO tasks (userId, title) VALUES (?, ?)').run(req.body.userId, req.body.title);
-    res.json({ success: true });
+// Hent Leaderboard
+app.get('/api/leaderboard', (req, res) => {
+    res.json(db.prepare('SELECT username, high_score FROM users WHERE high_score > 0 ORDER BY high_score DESC LIMIT 10').all());
 });
 
-app.listen(3000, () => console.log("Server på http://localhost:3000"));
+app.listen(3000, () => console.log("Boss Ateeb sin server kjører på http://localhost:3000"));
