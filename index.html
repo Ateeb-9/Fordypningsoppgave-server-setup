@@ -8,25 +8,22 @@
 <body>
     <nav>
         <a href="index.html">Hjem</a>
-        <a href="spill.html">Spill</a>
         <a href="Redigere-profil.html">Profil</a>
         <button onclick="logout()">Logg ut</button>
     </nav>
 
-    <!-- Vises kun for admin@gmail.com -->
-    <div class="card" id="adminPanel" style="width: 750px; display: none;">
+    <div class="card" id="adminPanel" style="width: 700px; display: none;">
         <div class="header grey">Admin: Database Tilgang</div>
         <div class="content">
             <table>
                 <thead>
-                    <tr><th>ID</th><th>Navn</th><th>E-post</th><th>Highscore</th><th>Handlinger</th></tr>
+                    <tr><th>ID</th><th>Navn</th><th>E-post</th><th>Handlinger</th></tr>
                 </thead>
                 <tbody id="userTableBody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- Vises for vanlige brukere -->
     <div id="noAccessMessage" class="card">
         <div class="header red">Ingen tilgang</div>
         <div class="content">

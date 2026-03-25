@@ -10,22 +10,26 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static(__dirname));
 
-// Opprett tabell med high_score
+// Opprett tabell (Forenklet uten high_score for å unngå krasj)
 db.prepare(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT,
         email TEXT UNIQUE,
-        password TEXT,
-        high_score INTEGER DEFAULT 0
+        password TEXT
     )
 `).run();
 
 // --- API RUTER ---
 
-// Hent alle brukere (Admin funksjon)
+// Hent alle brukere (Kun ID, Navn, E-post)
 app.get('/api/users', (req, res) => {
-    res.json(db.prepare('SELECT id, username, email, high_score FROM users').all());
+    try {
+        const users = db.prepare('SELECT id, username, email FROM users').all();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ error: "Kunne ikke hente brukere" });
+    }
 });
 
 // Registrering
@@ -34,7 +38,9 @@ app.post('/api/register', (req, res) => {
     try {
         db.prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)').run(username, email, password);
         res.json({ success: true });
-    } catch (e) { res.status(400).json({ error: "E-posten er opptatt!" }); }
+    } catch (e) {
+        res.status(400).json({ error: "E-posten er allerede i bruk!" });
+    }
 });
 
 // Innlogging med Admin-sjekk
@@ -43,7 +49,6 @@ app.post('/api/login', (req, res) => {
     const user = db.prepare('SELECT * FROM users WHERE email = ? AND password = ?').get(email, password);
     
     if (user) {
-        // Tvinger isAdmin til true hvis e-posten er admin@gmail.com
         const isAdmin = (user.email === 'admin@gmail.com');
         res.json({ 
             success: true, 
@@ -72,19 +77,6 @@ app.delete('/api/user/:id', (req, res) => {
     res.json({ success: true });
 });
 
-// Lagre spill-score
-app.post('/api/save-score', (req, res) => {
-    const { userId, score } = req.body;
-    const user = db.prepare('SELECT high_score FROM users WHERE id = ?').get(userId);
-    if (score > user.high_score) {
-        db.prepare('UPDATE users SET high_score = ? WHERE id = ?').run(score, userId);
-        res.json({ success: true, newRecord: true });
-    } else res.json({ success: true, newRecord: false });
-});
+app.listen(3000, () => console.log("Ateeb sin server kjører på http://localhost:3000"));
 
-// Hent Leaderboard
-app.get('/api/leaderboard', (req, res) => {
-    res.json(db.prepare('SELECT username, high_score FROM users WHERE high_score > 0 ORDER BY high_score DESC LIMIT 10').all());
-});
 
-app.listen(3000, () => console.log("Boss Ateeb sin server kjører på http://localhost:3000"));
